@@ -4,10 +4,12 @@ import { Message, User } from "@shared/schema";
 import { useAuth } from "@/hooks/use-auth";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Send, Phone, Video, Info } from "lucide-react";
+import { Send, Phone, Video, Info, Image, Smile } from "lucide-react";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { formatDistanceToNow, format } from "date-fns";
 import { cn } from "@/lib/utils";
+import { motion, AnimatePresence } from "framer-motion";
+import AvatarWithStatus from "@/components/ui/avatar-with-status";
 
 interface ChatAreaProps {
   selectedUserId: number | null;
@@ -19,7 +21,7 @@ export default function ChatArea({ selectedUserId }: ChatAreaProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   
   // Get selected user details
-  const { data: selectedUserDetails } = useQuery<User>({
+  const { data: selectedUserDetails } = useQuery<User | null>({
     queryKey: ["/api/users", selectedUserId],
     queryFn: async () => {
       if (!selectedUserId) return null;
@@ -116,36 +118,47 @@ export default function ChatArea({ selectedUserId }: ChatAreaProps) {
   return (
     <div className="w-full md:w-2/3 flex flex-col bg-background">
       {/* Chat Header */}
-      <div className="p-4 border-b border-border flex items-center justify-between">
+      <motion.div 
+        className="p-4 border-b border-border flex items-center justify-between"
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3 }}
+      >
         <div className="flex items-center">
-          <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center">
-            {selectedUserDetails?.username?.charAt(0).toUpperCase()}
-          </div>
+          <AvatarWithStatus
+            src={selectedUserDetails?.profilePicture}
+            name={selectedUserDetails?.name}
+            username={selectedUserDetails?.username || ""}
+            isOnline={selectedUserDetails?.isOnline}
+            size="md"
+          />
           <div className="ml-3">
-            <h3 className="font-semibold">{selectedUserDetails?.username}</h3>
+            <h3 className="font-semibold">{selectedUserDetails?.name || selectedUserDetails?.username}</h3>
             <div className="flex items-center">
-              <div className={cn(
-                "w-2 h-2 rounded-full",
-                selectedUserDetails?.isOnline ? "bg-green-500" : "bg-gray-400"
-              )}></div>
-              <span className="ml-1 text-xs text-muted-foreground">
-                {selectedUserDetails?.isOnline ? "Online" : "Offline"}
+              <span className="text-xs text-muted-foreground">
+                {selectedUserDetails?.isOnline ? "Active now" : "Inactive"}
               </span>
             </div>
           </div>
         </div>
         <div className="flex">
-          <Button variant="ghost" size="icon">
-            <Phone className="h-5 w-5 text-muted-foreground" />
-          </Button>
-          <Button variant="ghost" size="icon">
-            <Video className="h-5 w-5 text-muted-foreground" />
-          </Button>
-          <Button variant="ghost" size="icon">
-            <Info className="h-5 w-5 text-muted-foreground" />
-          </Button>
+          <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>
+            <Button variant="ghost" size="icon">
+              <Phone className="h-5 w-5 text-muted-foreground" />
+            </Button>
+          </motion.div>
+          <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>
+            <Button variant="ghost" size="icon">
+              <Video className="h-5 w-5 text-muted-foreground" />
+            </Button>
+          </motion.div>
+          <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>
+            <Button variant="ghost" size="icon">
+              <Info className="h-5 w-5 text-muted-foreground" />
+            </Button>
+          </motion.div>
         </div>
-      </div>
+      </motion.div>
       
       {/* Chat Messages */}
       <div className="flex-grow p-4 overflow-y-auto bg-muted/30 space-y-4">
@@ -175,30 +188,38 @@ export default function ChatArea({ selectedUserId }: ChatAreaProps) {
               
               {/* Messages for this date */}
               <div className="space-y-4">
-                {groupedMessages[dateKey].map((message) => (
-                  <div 
+                {groupedMessages[dateKey].map((message, index) => (
+                  <motion.div 
                     key={message.id} 
                     className={cn(
                       "flex items-end max-w-xs",
                       message.senderId === currentUser?.id ? "justify-end ml-auto" : ""
                     )}
+                    initial={{ opacity: 0, y: 20, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    transition={{ duration: 0.3, delay: index * 0.05 }}
                   >
                     {message.senderId !== currentUser?.id && (
-                      <div className="w-6 h-6 rounded-full bg-muted flex items-center justify-center mr-2">
-                        {selectedUserDetails?.username?.charAt(0).toUpperCase()}
-                      </div>
+                      <AvatarWithStatus
+                        src={selectedUserDetails?.profilePicture}
+                        name={selectedUserDetails?.name}
+                        username={selectedUserDetails?.username || ""}
+                        size="sm"
+                        showStatus={false}
+                      />
                     )}
                     <div>
-                      <div 
+                      <motion.div 
                         className={cn(
                           "p-3 mb-1",
                           message.senderId === currentUser?.id 
                             ? "bg-primary text-primary-foreground rounded-2xl rounded-br-none" 
                             : "bg-secondary/10 text-foreground rounded-2xl rounded-bl-none"
                         )}
+                        whileHover={{ scale: 1.02 }}
                       >
                         <p className="text-sm">{message.content}</p>
-                      </div>
+                      </motion.div>
                       <p className={cn(
                         "text-xs text-muted-foreground",
                         message.senderId === currentUser?.id ? "text-right" : ""
@@ -206,7 +227,7 @@ export default function ChatArea({ selectedUserId }: ChatAreaProps) {
                         {formatMessageTime(message.timestamp)}
                       </p>
                     </div>
-                  </div>
+                  </motion.div>
                 ))}
               </div>
             </div>
@@ -216,23 +237,23 @@ export default function ChatArea({ selectedUserId }: ChatAreaProps) {
       </div>
       
       {/* Message Input */}
-      <div className="p-4 border-t border-border bg-background">
+      <motion.div
+        className="p-4 border-t border-border bg-background"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3, delay: 0.1 }}
+      >
         <form className="flex items-center" onSubmit={handleSendMessage}>
-          <Button type="button" variant="ghost" size="icon">
-            <svg className="h-5 w-5 text-muted-foreground" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-              <circle cx="8.5" cy="8.5" r="1.5"></circle>
-              <polyline points="21 15 16 10 5 21"></polyline>
-            </svg>
-          </Button>
-          <Button type="button" variant="ghost" size="icon">
-            <svg className="h-5 w-5 text-muted-foreground" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <circle cx="12" cy="12" r="10"></circle>
-              <path d="M8 14s1.5 2 4 2 4-2 4-2"></path>
-              <line x1="9" y1="9" x2="9.01" y2="9"></line>
-              <line x1="15" y1="9" x2="15.01" y2="9"></line>
-            </svg>
-          </Button>
+          <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
+            <Button type="button" variant="ghost" size="icon">
+              <Image className="h-5 w-5 text-muted-foreground" />
+            </Button>
+          </motion.div>
+          <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
+            <Button type="button" variant="ghost" size="icon">
+              <Smile className="h-5 w-5 text-muted-foreground" />
+            </Button>
+          </motion.div>
           <Input 
             type="text" 
             placeholder="Type a message..." 
@@ -240,17 +261,22 @@ export default function ChatArea({ selectedUserId }: ChatAreaProps) {
             value={messageText}
             onChange={(e) => setMessageText(e.target.value)}
           />
-          <Button 
-            type="submit" 
-            variant="ghost" 
-            size="icon" 
-            className="text-primary"
-            disabled={sendMessageMutation.isPending || !messageText.trim()}
+          <motion.div
+            whileHover={{ scale: 1.1, rotate: 10 }}
+            whileTap={{ scale: 0.9 }}
           >
-            <Send className="h-5 w-5" />
-          </Button>
+            <Button 
+              type="submit" 
+              variant={messageText.trim() ? "default" : "ghost"}
+              size="icon" 
+              className={messageText.trim() ? "bg-primary text-primary-foreground" : "text-muted-foreground"}
+              disabled={sendMessageMutation.isPending || !messageText.trim()}
+            >
+              <Send className="h-5 w-5" />
+            </Button>
+          </motion.div>
         </form>
-      </div>
+      </motion.div>
     </div>
   );
 }

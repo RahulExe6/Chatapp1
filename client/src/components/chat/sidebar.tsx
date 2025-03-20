@@ -6,8 +6,13 @@ import {
   Compass, 
   Bell, 
   Settings, 
-  LogOut 
+  LogOut,
+  Users,
+  Home
 } from "lucide-react";
+import { motion } from "framer-motion";
+import AvatarWithStatus from "@/components/ui/avatar-with-status";
+import EditProfile from "@/components/profile/edit-profile";
 
 interface SidebarProps {
   className?: string;
@@ -31,56 +36,84 @@ export default function Sidebar({ className }: SidebarProps) {
       
       {/* Navigation Menu */}
       <nav className="w-full flex flex-col flex-grow">
-        <Button 
-          variant="ghost" 
-          className="flex justify-start items-center px-4 py-3 text-primary"
-        >
-          <MessageSquare className="h-5 w-5 mr-0 lg:mr-4" />
-          <span className="ml-0 hidden lg:block">Messages</span>
-        </Button>
-        <Button 
-          variant="ghost" 
-          className="flex justify-start items-center px-4 py-3 text-muted-foreground"
-        >
-          <Compass className="h-5 w-5 mr-0 lg:mr-4" />
-          <span className="ml-0 hidden lg:block">Discover</span>
-        </Button>
-        <Button 
-          variant="ghost" 
-          className="flex justify-start items-center px-4 py-3 text-muted-foreground"
-        >
-          <Bell className="h-5 w-5 mr-0 lg:mr-4" />
-          <span className="ml-0 hidden lg:block">Notifications</span>
-        </Button>
-        <Button 
-          variant="ghost" 
-          className="flex justify-start items-center px-4 py-3 text-muted-foreground"
-        >
-          <Settings className="h-5 w-5 mr-0 lg:mr-4" />
-          <span className="ml-0 hidden lg:block">Settings</span>
-        </Button>
+        {[
+          { icon: Home, label: "Home", active: false },
+          { icon: MessageSquare, label: "Messages", active: true },
+          { icon: Users, label: "Connections", active: false },
+          { icon: Bell, label: "Notifications", active: false },
+          { icon: Settings, label: "Settings", active: false }
+        ].map((item, index) => (
+          <motion.div 
+            key={item.label}
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.3, delay: index * 0.1 }}
+            whileHover={{ x: 5 }}
+          >
+            <Button 
+              variant="ghost" 
+              className={`flex justify-start items-center px-4 py-3 w-full ${item.active ? 'text-primary' : 'text-muted-foreground'}`}
+            >
+              <item.icon className="h-5 w-5 mr-0 lg:mr-4" />
+              <span className="ml-0 hidden lg:block">{item.label}</span>
+              {item.active && (
+                <motion.div 
+                  className="h-6 w-1 bg-primary absolute right-0 rounded-l-full"
+                  layoutId="activeNav"
+                />
+              )}
+            </Button>
+          </motion.div>
+        ))}
       </nav>
       
-      {/* User Profile */}
-      <div className="mt-auto w-full px-4 py-3 flex items-center cursor-pointer hover:bg-accent">
-        <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white">
-          {user?.username?.charAt(0).toUpperCase()}
-        </div>
-        <div className="ml-4 hidden lg:block">
-          <p className="font-medium text-sm">{user?.username}</p>
-          <div className="flex items-center">
-            <div className="w-2 h-2 rounded-full bg-green-500"></div>
-            <span className="ml-1 text-xs text-muted-foreground">Online</span>
-          </div>
-        </div>
-        <Button 
-          variant="ghost" 
-          size="icon" 
-          className="ml-auto text-muted-foreground hidden lg:flex"
-          onClick={handleLogout}
+      {/* User Profile and Edit Profile */}
+      <div className="mt-auto w-full flex flex-col">
+        <motion.div 
+          className="px-4 py-3 flex items-center hover:bg-accent/50 transition-colors rounded-md mx-2"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, delay: 0.5 }}
         >
-          <LogOut className="h-5 w-5" />
-        </Button>
+          <AvatarWithStatus 
+            src={user?.profilePicture}
+            name={user?.name}
+            username={user?.username || ""}
+            isOnline={true}
+            size="md"
+          />
+          <div className="ml-3 hidden lg:block">
+            <p className="font-medium text-sm">{user?.name || user?.username}</p>
+            <div className="flex items-center">
+              <div className="w-2 h-2 rounded-full bg-green-500"></div>
+              <span className="ml-1 text-xs text-muted-foreground">Online</span>
+            </div>
+          </div>
+          <motion.div
+            className="ml-auto hidden lg:block"
+            whileHover={{ rotate: 15 }}
+            whileTap={{ scale: 0.9 }}
+          >
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="text-muted-foreground"
+              onClick={handleLogout}
+            >
+              <LogOut className="h-5 w-5" />
+            </Button>
+          </motion.div>
+        </motion.div>
+        
+        {/* Edit Profile Button */}
+        <motion.div
+          className="pt-2"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, delay: 0.6 }}
+        >
+          <EditProfile />
+        </motion.div>
       </div>
     </div>
   );
