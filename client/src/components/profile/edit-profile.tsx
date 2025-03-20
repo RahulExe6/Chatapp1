@@ -1,10 +1,11 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, Camera } from "lucide-react";
 import { motion } from "framer-motion";
-import axios from "axios";
+import { apiRequest } from "@/lib/queryClient";
 
 export default function EditProfile() {
   const { toast } = useToast();
@@ -23,7 +24,7 @@ export default function EditProfile() {
     setIsLoading(true);
 
     try {
-      await axios.patch("/api/user/profile", { name, profilePicture });
+      await apiRequest("PATCH", "/api/user/profile", { name, profilePicture });
       toast({ description: "Profile updated successfully!" });
       setShowAvatars(false);
     } catch (error) {
