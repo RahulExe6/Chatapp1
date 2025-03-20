@@ -1,10 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { useMutation } from "@tanstack/react-query";
 import { User } from "@shared/schema";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Check, UserRound } from "lucide-react";
+import { Loader2, Check, UserRound, Pencil, Camera } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -15,9 +15,10 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
+  DialogFooter,
 } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 
 export default function EditProfile() {
   const { user } = useAuth();
@@ -101,66 +102,119 @@ export default function EditProfile() {
 
   const avatar = generateAvatar(user?.name || "");
 
+  // Update state when user changes
+  useEffect(() => {
+    if (user) {
+      setName(user.name || "");
+      setProfilePicture(user.profilePicture || "");
+    }
+  }, [user]);
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button variant="ghost" className="h-full w-full p-0 flex flex-col items-center justify-center">
-          {user?.profilePicture ? (
-            <img 
-              src={user.profilePicture} 
-              alt={user.name || user.username} 
-              className="h-12 w-12 rounded-full object-cover mb-1"
-            />
-          ) : (
-            <div className={cn("h-12 w-12 rounded-full flex items-center justify-center text-white mb-1", avatar.bgColor)}>
-              {avatar.initials}
+          <div className="relative group">
+            {user?.profilePicture ? (
+              <img 
+                src={user.profilePicture} 
+                alt={user.name || user.username} 
+                className="h-14 w-14 rounded-full object-cover"
+              />
+            ) : (
+              <div className={cn("h-14 w-14 rounded-full flex items-center justify-center text-white", avatar.bgColor)}>
+                {avatar.initials}
+              </div>
+            )}
+            <div className="absolute inset-0 bg-black bg-opacity-40 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+              <Pencil className="h-5 w-5 text-white" />
             </div>
-          )}
-          <span className="text-xs font-medium">Edit Profile</span>
+          </div>
+          <span className="text-xs font-medium mt-2">Edit Profile</span>
         </Button>
       </DialogTrigger>
 
       <DialogContent className="sm:max-w-[425px]">
-        <DialogHeader>
-          <DialogTitle>Edit profile</DialogTitle>
+        <DialogHeader className="text-center pb-4 border-b">
+          <DialogTitle className="text-xl font-bold">Edit Profile</DialogTitle>
           <DialogDescription>
-            Update your profile information here. Click save when you're done.
+            Customize how others see you on InstantChat
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-6 py-4">
+        <form onSubmit={handleSubmit} className="space-y-6 py-6">
+          {/* Profile picture selection with preview */}
+          <div className="flex flex-col items-center mb-6">
+            <motion.div 
+              className="relative w-24 h-24 mb-4 cursor-pointer group"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.98 }}
+            >
+              {profilePicture ? (
+                <img 
+                  src={profilePicture} 
+                  alt={name || user?.username} 
+                  className="w-24 h-24 rounded-full object-cover border-2 border-primary/20"
+                />
+              ) : (
+                <div className={cn("w-24 h-24 rounded-full flex items-center justify-center text-white text-2xl font-bold", avatar.bgColor)}>
+                  {avatar.initials}
+                </div>
+              )}
+              <div className="absolute inset-0 bg-black bg-opacity-50 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                <Camera className="h-8 w-8 text-white" />
+              </div>
+            </motion.div>
+            <p className="text-sm text-muted-foreground">Tap to change your profile picture</p>
+          </div>
+
+          {/* Display name field */}
           <div className="space-y-2">
-            <Label htmlFor="name">Display Name</Label>
+            <Label htmlFor="name" className="text-sm font-medium">
+              Display Name
+            </Label>
             <Input
               id="name"
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="Enter your display name"
+              className="focus-visible:ring-primary"
             />
+            <p className="text-xs text-muted-foreground">
+              This is how people will see you in the app
+            </p>
           </div>
 
+          {/* Avatar options grid */}
           <div className="space-y-3">
-            <Label>Profile Picture</Label>
-            <div className="grid grid-cols-3 gap-2">
+            <Label className="text-sm font-medium">Choose an Avatar</Label>
+            <div className="grid grid-cols-3 gap-3">
               {/* First option: No profile picture (use initials) */}
               <motion.button
                 type="button"
                 className={cn(
-                  "aspect-square rounded-md flex items-center justify-center border-2",
-                  !profilePicture ? "border-primary" : "border-transparent hover:border-gray-300"
+                  "aspect-square rounded-lg flex items-center justify-center border-2 relative overflow-hidden",
+                  !profilePicture ? "border-primary" : "border-transparent hover:border-primary/50"
                 )}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.97 }}
                 onClick={() => setProfilePicture("")}
               >
-                <div className={cn("h-12 w-12 rounded-full flex items-center justify-center text-white", avatar.bgColor)}>
+                <div className={cn("h-16 w-16 rounded-full flex items-center justify-center text-white text-lg", avatar.bgColor)}>
                   {avatar.initials}
                 </div>
-                {!profilePicture && (
-                  <div className="absolute bottom-1 right-1 bg-green-500 text-white rounded-full p-0.5">
-                    <Check className="h-3 w-3" />
-                  </div>
-                )}
+                <AnimatePresence>
+                  {!profilePicture && (
+                    <motion.div 
+                      className="absolute bottom-1 right-1 bg-primary text-primary-foreground rounded-full p-1"
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      exit={{ scale: 0 }}
+                    >
+                      <Check className="h-3 w-3" />
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </motion.button>
 
               {/* Avatar options */}
@@ -169,39 +223,51 @@ export default function EditProfile() {
                   key={index}
                   type="button"
                   className={cn(
-                    "aspect-square rounded-md flex items-center justify-center border-2 relative",
-                    profilePicture === avatarUrl ? "border-primary" : "border-transparent hover:border-gray-300"
+                    "aspect-square rounded-lg flex items-center justify-center border-2 relative overflow-hidden",
+                    profilePicture === avatarUrl ? "border-primary" : "border-transparent hover:border-primary/50"
                   )}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.97 }}
                   onClick={() => setProfilePicture(avatarUrl)}
                 >
-                  <img src={avatarUrl} alt={`Avatar option ${index + 1}`} className="h-12 w-12 rounded-full" />
-                  {profilePicture === avatarUrl && (
-                    <div className="absolute bottom-1 right-1 bg-green-500 text-white rounded-full p-0.5">
-                      <Check className="h-3 w-3" />
-                    </div>
-                  )}
+                  <img src={avatarUrl} alt={`Avatar option ${index + 1}`} className="h-full w-full object-cover" />
+                  <AnimatePresence>
+                    {profilePicture === avatarUrl && (
+                      <motion.div 
+                        className="absolute bottom-1 right-1 bg-primary text-primary-foreground rounded-full p-1"
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        exit={{ scale: 0 }}
+                      >
+                        <Check className="h-3 w-3" />
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </motion.button>
               ))}
             </div>
           </div>
 
-          <div className="flex justify-end gap-2">
-            <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+          <DialogFooter className="pt-4 border-t gap-3 flex-col sm:flex-row">
+            <Button 
+              type="button" 
+              variant="outline" 
+              className="w-full sm:w-auto" 
+              onClick={() => setOpen(false)}
+            >
               Cancel
             </Button>
             <Button 
               type="submit" 
               disabled={updateProfileMutation.isPending}
-              className="flex items-center gap-1"
+              className="w-full sm:w-auto flex items-center justify-center gap-2"
             >
               {updateProfileMutation.isPending && (
                 <Loader2 className="h-4 w-4 animate-spin" />
               )}
               Save Changes
             </Button>
-          </div>
+          </DialogFooter>
         </form>
       </DialogContent>
     </Dialog>
