@@ -121,10 +121,10 @@ export default function AuthPage() {
                     </Button>
                   </form>
                 </Form>
-                <div className="flex items-center my-4">
-                  <Separator className="flex-grow" />
-                  <span className="px-4 text-sm text-muted-foreground">OR</span>
-                  <Separator className="flex-grow" />
+                <div className="flex items-center justify-center gap-4 my-4">
+                  <Separator className="w-1/3" />
+                  <span className="text-sm text-muted-foreground">OR</span>
+                  <Separator className="w-1/3" />
                 </div>
                 <p className="text-center text-sm">
                   Don't have an account?{" "}
