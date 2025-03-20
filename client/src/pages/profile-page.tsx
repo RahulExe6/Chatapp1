@@ -91,7 +91,11 @@ export default function ProfilePage() {
             animate={{ scale: 1, opacity: 1 }}
             className="relative w-32 h-32 md:w-40 md:h-40"
           >
-            <StarryBackground />
+            <div className="absolute inset-0 rounded-full overflow-hidden">
+              <div className="w-full h-full bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-slate-900 via-purple-900 to-slate-900 animate-[pulse_4s_ease-in-out_infinite]">
+                <div className="absolute inset-0 bg-[url('/stars.png')] opacity-50"></div>
+              </div>
+            </div>
             <AvatarWithStatus
               src={user.profilePicture}
               username={user.username}

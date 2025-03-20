@@ -8,3 +8,13 @@
   animation: twinkle 3s infinite;
 }
 
+
+
+@keyframes twinkle {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}
+
+.animate-twinkle {
+  animation: twinkle 2s ease-in-out infinite;
+}
