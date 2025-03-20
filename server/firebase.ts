@@ -23,7 +23,7 @@ let db, rtdb, storage, auth;
 
 try {
   const serviceAccount = JSON.parse(
-    fs.readFileSync(path.join(__dirname, 'firebase-credentials.json'), 'utf8')
+    fs.readFileSync(new URL('./firebase-credentials.json', import.meta.url), 'utf8')
   );
 
   const app = admin.initializeApp({
