@@ -3,9 +3,17 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Camera } from "lucide-react";
+import { Loader2, Camera, Settings } from "lucide-react";
 import { motion } from "framer-motion";
 import { apiRequest } from "@/lib/queryClient";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 export default function EditProfile() {
   const { toast } = useToast();
@@ -25,11 +33,11 @@ export default function EditProfile() {
     setIsLoading(true);
 
     try {
-      const response = await apiRequest("PATCH", "/api/user/profile", { name, profilePicture });
+      await apiRequest("PATCH", "/api/user/profile", { name, profilePicture });
       toast({ description: "Profile updated successfully!" });
       setShowAvatars(false);
-      setIsOpen(false); // Close the dialog
-      window.location.reload(); // Refresh to show updated profile
+      setIsOpen(false);
+      window.location.reload();
     } catch (error) {
       toast({ description: "Failed to update profile", variant: "destructive" });
     } finally {
@@ -38,14 +46,19 @@ export default function EditProfile() {
   };
 
   return (
-    <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center">
-      <div className="bg-card rounded-lg shadow-lg w-full max-w-md p-6">
-        <div className="text-center space-y-2">
-          <h2 className="text-2xl font-bold">Edit Profile</h2>
-          <p className="text-muted-foreground">Update your profile information</p>
-        </div>
-
-        <form onSubmit={handleSubmit} className="mt-6 space-y-6">
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+      <DialogTrigger asChild>
+        <Button variant="ghost" size="icon" className="text-muted-foreground">
+          <Settings className="h-5 w-5" />
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="max-w-md">
+        <DialogHeader>
+          <DialogTitle>Edit Profile</DialogTitle>
+          <DialogDescription>Update your profile information</DialogDescription>
+        </DialogHeader>
+        
+        <form onSubmit={handleSubmit} className="space-y-6">
           <div className="flex flex-col items-center space-y-4">
             <motion.div 
               className="relative w-24 h-24 cursor-pointer group"
@@ -76,26 +89,32 @@ export default function EditProfile() {
                     className={`w-16 h-16 rounded-full cursor-pointer border-2 transition-all ${
                       profilePicture === avatar ? "border-primary" : "border-transparent"
                     }`}
-                    onClick={() => setProfilePicture(avatar)}
+                    onClick={() => {
+                      setProfilePicture(avatar);
+                      setShowAvatars(false);
+                    }}
                     whileHover={{ scale: 1.1 }}
                   />
                 ))}
               </motion.div>
             )}
 
-            <Input
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Enter your display name"
-              className="w-full"
-            />
+            <div className="w-full space-y-2">
+              <Input
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Enter your display name"
+                className="w-full"
+              />
+            </div>
           </div>
 
           <div className="flex gap-3">
             <Button
+              type="button"
               variant="outline"
               className="flex-1"
-              onClick={() => setShowAvatars(false)}
+              onClick={() => setIsOpen(false)}
             >
               Cancel
             </Button>
@@ -109,7 +128,7 @@ export default function EditProfile() {
             </Button>
           </div>
         </form>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 }
