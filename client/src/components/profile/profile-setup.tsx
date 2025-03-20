@@ -16,6 +16,11 @@ export default function ProfileSetup() {
   const [isLoading, setIsLoading] = useState(false);
   const defaultAvatar = `https://api.dicebear.com/7.x/micah/svg?seed=${Date.now()}`;
   const [profilePicture, setProfilePicture] = useState(defaultAvatar);
+  const [showAvatars, setShowAvatars] = useState(false);
+
+  const avatarOptions = Array.from({ length: 9 }, (_, i) => 
+    `https://api.dicebear.com/7.x/micah/svg?seed=${i + 1}`
+  );
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -48,6 +53,7 @@ export default function ProfileSetup() {
           <motion.div 
             className="relative w-24 h-24 mb-4 cursor-pointer group"
             whileHover={{ scale: 1.05 }}
+            onClick={() => setShowAvatars(!showAvatars)}
           >
             <img 
               src={profilePicture} 
@@ -59,6 +65,31 @@ export default function ProfileSetup() {
             </div>
           </motion.div>
           <p className="text-sm text-muted-foreground">Tap to change your profile picture</p>
+          
+          {showAvatars && (
+            <motion.div 
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="grid grid-cols-3 gap-3 mt-4 p-3 bg-muted rounded-lg"
+            >
+              {avatarOptions.map((avatar, index) => (
+                <motion.img
+                  key={index}
+                  src={avatar}
+                  alt={`Avatar option ${index + 1}`}
+                  className={cn(
+                    "w-16 h-16 rounded-full cursor-pointer border-2 transition-all",
+                    profilePicture === avatar ? "border-primary" : "border-transparent"
+                  )}
+                  onClick={() => {
+                    setProfilePicture(avatar);
+                    setShowAvatars(false);
+                  }}
+                  whileHover={{ scale: 1.1 }}
+                />
+              ))}
+            </motion.div>
+          )}
         </div>
 
         <div className="space-y-2">
