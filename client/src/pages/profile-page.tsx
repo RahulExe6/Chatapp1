@@ -77,7 +77,7 @@ export default function ProfilePage() {
               isOnline={true}
               size="lg"
               showStatus={false}
-              className="w-24 h-24 md:w-32 md:h-32 border-4 border-white"
+              className="w-full h-full aspect-square rounded-full border-4 border-white"
             />
           </motion.div>
 

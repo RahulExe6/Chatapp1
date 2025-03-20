@@ -66,7 +66,7 @@ export default function AvatarWithStatus({
           src={src}
           alt={name || username}
           className={cn(
-            "rounded-full object-cover",
+            "rounded-full object-cover w-full h-full",
             sizeClasses[size].avatar
           )}
         />
