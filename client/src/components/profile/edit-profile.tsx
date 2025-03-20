@@ -9,6 +9,7 @@ import { apiRequest } from "@/lib/queryClient";
 
 export default function EditProfile() {
   const { toast } = useToast();
+  const [isOpen, setIsOpen] = useState(false);
   const [name, setName] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const defaultAvatar = `https://api.dicebear.com/7.x/micah/svg?seed=${Date.now()}`;
@@ -24,9 +25,11 @@ export default function EditProfile() {
     setIsLoading(true);
 
     try {
-      await apiRequest("PATCH", "/api/user/profile", { name, profilePicture });
+      const response = await apiRequest("PATCH", "/api/user/profile", { name, profilePicture });
       toast({ description: "Profile updated successfully!" });
       setShowAvatars(false);
+      setIsOpen(false); // Close the dialog
+      window.location.reload(); // Refresh to show updated profile
     } catch (error) {
       toast({ description: "Failed to update profile", variant: "destructive" });
     } finally {
