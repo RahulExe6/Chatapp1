@@ -3,7 +3,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useAuth } from "@/hooks/use-auth";
 import { useState, useEffect } from "react";
-import { Redirect } from "wouter";
+import { Redirect, Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
@@ -53,7 +53,7 @@ export default function AuthPage() {
   };
 
   const [, setLocation] = useLocation();
-  
+
   const onRegisterSubmit = async (data: RegisterFormValues) => {
     const { confirmPassword, ...registerData } = data;
     try {
