@@ -1,8 +1,10 @@
+
 import admin from 'firebase-admin';
 import { getFirestore, Timestamp, FieldValue } from 'firebase-admin/firestore';
 import { getDatabase } from 'firebase-admin/database';
 import { getStorage } from 'firebase-admin/storage';
 import { getAuth } from 'firebase-admin/auth';
+import path from 'path';
 
 // Firebase client configuration for frontend
 export const firebaseConfig = {
@@ -23,31 +25,26 @@ let firebaseInitialized = false;
 let db, rtdb, storage, auth;
 
 try {
-  // Check if Firebase credentials are available
-  try {
-    const serviceAccount = require('./firebase-credentials.json');
-    
-    console.log('Initializing Firebase with service account...');
-    
-    // Initialize Firebase Admin SDK
-    const app = admin.initializeApp({
-      credential: admin.credential.cert(serviceAccount),
-      databaseURL: firebaseConfig.databaseURL,
-      storageBucket: firebaseConfig.storageBucket
-    });
-    
-    // Initialize Firebase services
-    db = getFirestore(app);
-    rtdb = getDatabase(app);
-    storage = getStorage(app);
-    auth = getAuth(app);
-    
-    firebaseInitialized = true;
-    console.log('Firebase Admin SDK initialized successfully');
-  }
+  // Initialize Firebase Admin SDK with credentials file
+  const serviceAccount = require('./firebase-credentials.json');
+  
+  const app = admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount),
+    databaseURL: firebaseConfig.databaseURL,
+    storageBucket: firebaseConfig.storageBucket
+  });
+  
+  // Initialize Firebase services
+  db = getFirestore(app);
+  rtdb = getDatabase(app);
+  storage = getStorage(app);
+  auth = getAuth(app);
+  
+  firebaseInitialized = true;
+  console.log('Firebase Admin SDK initialized successfully');
 } catch (error) {
   console.error('Error initializing Firebase Admin SDK:', error);
 }
 
-// Export Firebase services and flag (some may be undefined if initialization failed)
+// Export Firebase services and flag
 export { admin, db, rtdb, storage, auth, Timestamp, FieldValue, firebaseInitialized };
