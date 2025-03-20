@@ -5,6 +5,8 @@ import { Input } from "@/components/ui/input";
 import { formatDistanceToNow } from "date-fns";
 import { Chat } from "@shared/schema";
 import { cn } from "@/lib/utils";
+import { motion } from "framer-motion";
+import AvatarWithStatus from "@/components/ui/avatar-with-status";
 
 interface ChatListProps {
   onSelectChat: (chatId: number) => void;
@@ -55,39 +57,46 @@ export default function ChatList({ onSelectChat, selectedChatId }: ChatListProps
             {searchTerm ? "No chats match your search" : "No chats yet"}
           </div>
         ) : (
-          filteredChats.map((chat) => (
-            <div 
+          filteredChats.map((chat, index) => (
+            <motion.div 
               key={chat.id}
               className={cn(
                 "p-4 flex items-center cursor-pointer hover:bg-accent/10",
                 selectedChatId === chat.id ? "bg-accent/10" : ""
               )}
               onClick={() => onSelectChat(chat.id)}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.2, delay: index * 0.05 }}
+              whileHover={{ x: 5 }}
             >
-              <div className="relative">
-                <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center">
-                  {chat.username.charAt(0).toUpperCase()}
-                </div>
-                <div className={cn(
-                  "absolute bottom-0 right-0 w-3 h-3 border-2 border-background rounded-full",
-                  chat.isOnline ? "bg-green-500" : "bg-gray-400"
-                )}></div>
-              </div>
+              <AvatarWithStatus
+                src={chat.profilePicture}
+                name={chat.name}
+                username={chat.username}
+                isOnline={chat.isOnline}
+                size="lg"
+              />
               <div className="ml-3 flex-grow">
                 <div className="flex justify-between items-center">
-                  <h3 className="font-semibold text-sm">{chat.username}</h3>
+                  <h3 className="font-semibold text-sm">{chat.name || chat.username}</h3>
                   <span className="text-xs text-muted-foreground">{formatTimestamp(chat.timestamp)}</span>
                 </div>
                 <div className="flex justify-between">
                   <p className="text-sm text-muted-foreground truncate max-w-[180px]">{chat.lastMessage}</p>
                   {chat.unread > 0 && (
-                    <span className="ml-2 bg-primary text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                    <motion.span 
+                      className="ml-2 bg-primary text-primary-foreground text-xs rounded-full h-5 min-w-5 flex items-center justify-center px-1"
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                    >
                       {chat.unread}
-                    </span>
+                    </motion.span>
                   )}
                 </div>
               </div>
-            </div>
+            </motion.div>
           ))
         )}
       </div>
