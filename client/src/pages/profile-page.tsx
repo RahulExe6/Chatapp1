@@ -21,11 +21,9 @@ const StarryBackground = () => (
       backgroundImage: "linear-gradient(to bottom, #000000, #111111), url('/starry-night.jpg')", //replace with actual image path
       backgroundSize: "cover",
       backgroundPosition: "center",
-      opacity:0.8,
-      zIndex:-1,
-      borderRadius:"50%"
-
-
+      opacity: 0.8,
+      zIndex: -1,
+      borderRadius: "50%"
     }}
   />
 );
@@ -44,23 +42,10 @@ export default function ProfilePage() {
 
   if (!user) return null;
 
-  // Generate a gradient background for the header
-  const generateGradient = () => {
-    const colors = [
-      "from-pink-400 to-purple-600",
-      "from-blue-400 to-indigo-600",
-      "from-green-400 to-teal-600",
-      "from-orange-400 to-red-600",
-      "from-fuchsia-400 to-pink-600",
-    ];
-
-    // Use username length to pick a consistent gradient
-    const colorIndex = user.username.length % colors.length;
-    return colors[colorIndex];
-  };
 
   return (
-    <div className="flex flex-col min-h-screen bg-background overflow-y-auto">
+    <div className="flex flex-col min-h-screen bg-background overflow-y-auto relative">
+      <StarryBackground /> {/* Added starry background */}
       {/* Header */}
       <header className="sticky top-0 z-10 bg-background border-b border-border p-4 flex items-center">
         <Button
@@ -78,8 +63,8 @@ export default function ProfilePage() {
       </header>
 
       {/* Profile Info */}
-      <motion.div 
-        className={cn("p-6 pb-8 bg-gradient-to-r", generateGradient())}
+      <motion.div
+        className="p-6 pb-8 bg-black"  {/* Changed background to black */}
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
@@ -109,7 +94,7 @@ export default function ProfilePage() {
 
           {/* Profile Info */}
           <div className="flex flex-col text-center md:text-left flex-1 text-white">
-            <motion.h2 
+            <motion.h2
               className="text-2xl font-bold mb-1"
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -118,7 +103,7 @@ export default function ProfilePage() {
               {user.name || user.username}
             </motion.h2>
 
-            <motion.p 
+            <motion.p
               className="text-sm text-white/80 mb-3"
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -127,7 +112,7 @@ export default function ProfilePage() {
               @{user.username}
             </motion.p>
 
-            <motion.div 
+            <motion.div
               className="flex flex-wrap justify-center md:justify-start gap-4 mb-4"
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -147,7 +132,7 @@ export default function ProfilePage() {
               </div>
             </motion.div>
 
-            <motion.div 
+            <motion.div
               className="mt-auto"
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
