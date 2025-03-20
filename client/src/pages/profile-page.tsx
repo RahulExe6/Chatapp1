@@ -64,7 +64,7 @@ export default function ProfilePage() {
 
       {/* Profile Info */}
       <motion.div
-        className="p-6 pb-8 bg-black"  {/* Changed background to black */}
+        className="p-6 pb-8 bg-black" // Changed background to black
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
