@@ -26,7 +26,19 @@ let db, rtdb, storage, auth;
 
 try {
   // Initialize Firebase Admin SDK with credentials file
-  const serviceAccount = require('./firebase-credentials.json');
+  const serviceAccount = {
+    type: "service_account",
+    project_id: "chatapp-c7950",
+    private_key_id: "2c254eb3a1",
+    private_key: "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDGzPJHTIyqlRTS\nDPn85GiMC7gNgoGtP39o2VMRgJSjbkW12nUXXTQfSI0hVU/uxvxegzvpPxwzNFHr\nMiLosIExXZP08LQ+vOnT7DNzvOwRCNsTWsps/eKAEgDhxBUtzSejUUPIgBdsbUnT\nu1vwzpD/eeqYjApsGBE9GfXaU7Be4m40Bz3FFCS1iCEkLvq8T6eC1fnhw5S5Hal2\nuuD0L4MmeSG1C6c",
+    client_email: "firebase-adminsdk-fbsvc@chatapp-c7950.iam.gserviceaccount.com",
+    client_id: "112928116877502512982",
+    auth_uri: "https://accounts.google.com/o/oauth2/auth",
+    token_uri: "https://oauth2.googleapis.com/token",
+    auth_provider_x509_cert_url: "https://www.googleapis.com/oauth2/v1/certs",
+    client_x509_cert_url: "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-fbsvc%40chatapp-c7950.iam.gserviceaccount.com",
+    universe_domain: "googleapis.com"
+  };
   
   const app = admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
