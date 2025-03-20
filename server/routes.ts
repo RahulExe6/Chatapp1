@@ -2,6 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { setupAuth } from "./auth";
 import { storage } from "./storage";
+import { User } from "@shared/schema";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // sets up /api/register, /api/login, /api/logout, /api/user
@@ -71,6 +72,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
       
       res.status(201).json(message);
+    } catch (err) {
+      next(err);
+    }
+  });
+  
+  // Update user profile
+  app.patch("/api/user/profile", async (req, res, next) => {
+    try {
+      if (!req.isAuthenticated()) return res.sendStatus(401);
+      
+      const userId = (req.user as any).id;
+      const { name, profilePicture } = req.body;
+      
+      // Only allow updating name and profilePicture
+      const updates: Partial<Pick<User, 'name' | 'profilePicture'>> = {};
+      if (name !== undefined) updates.name = name;
+      if (profilePicture !== undefined) updates.profilePicture = profilePicture;
+      
+      const updatedUser = await storage.updateUserProfile(userId, updates);
+      if (!updatedUser) {
+        return res.status(404).send("User not found");
+      }
+      
+      // Remove password before sending to client
+      const userWithoutPassword = { ...updatedUser } as any;
+      delete userWithoutPassword.password;
+      
+      res.json(userWithoutPassword);
     } catch (err) {
       next(err);
     }

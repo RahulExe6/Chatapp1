@@ -12,6 +12,7 @@ export interface IStorage {
   getUserByUsername(username: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
   updateUserOnlineStatus(id: number, isOnline: boolean): Promise<User | undefined>;
+  updateUserProfile(id: number, updates: Partial<Pick<User, 'name' | 'profilePicture'>>): Promise<User | undefined>;
   getAllUsers(): Promise<User[]>;
   
   // Message methods
@@ -54,7 +55,13 @@ export class MemStorage implements IStorage {
 
   async createUser(insertUser: InsertUser): Promise<User> {
     const id = this.currentUserId++;
-    const user: User = { ...insertUser, id, isOnline: true };
+    const user: User = { 
+      ...insertUser, 
+      id, 
+      isOnline: true,
+      name: insertUser.name || null,
+      profilePicture: insertUser.profilePicture || null
+    };
     this.users.set(id, user);
     return user;
   }
@@ -63,6 +70,16 @@ export class MemStorage implements IStorage {
     const user = this.users.get(id);
     if (user) {
       const updatedUser = { ...user, isOnline };
+      this.users.set(id, updatedUser);
+      return updatedUser;
+    }
+    return undefined;
+  }
+  
+  async updateUserProfile(id: number, updates: Partial<Pick<User, 'name' | 'profilePicture'>>): Promise<User | undefined> {
+    const user = this.users.get(id);
+    if (user) {
+      const updatedUser = { ...user, ...updates };
       this.users.set(id, updatedUser);
       return updatedUser;
     }
@@ -137,6 +154,8 @@ export class MemStorage implements IStorage {
       chats.push({
         id: chatUserId,
         username: chatUser.username,
+        name: chatUser.name,
+        profilePicture: chatUser.profilePicture,
         isOnline: chatUser.isOnline,
         lastMessage: lastMessage.content,
         timestamp: lastMessage.timestamp,
