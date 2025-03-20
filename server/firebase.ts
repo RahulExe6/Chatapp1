@@ -27,13 +27,16 @@ try {
   if (!process.env.FIREBASE_CLIENT_EMAIL || !process.env.FIREBASE_PRIVATE_KEY) {
     console.warn('Missing Firebase credentials in environment variables. Firebase services will not be available.');
   } else {
-    const serviceAccount = require('./firebase-credentials.json');
+    // Using dynamic import for JSON
+    const serviceAccount = await import('./firebase-credentials.json', {
+      assert: { type: 'json' }
+    });
     
     console.log('Initializing Firebase with service account...');
     
     // Initialize Firebase Admin SDK
     const app = admin.initializeApp({
-      credential: admin.credential.cert(serviceAccount),
+      credential: admin.credential.cert(serviceAccount.default),
       databaseURL: firebaseConfig.databaseURL,
       storageBucket: firebaseConfig.storageBucket
     });
