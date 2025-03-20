@@ -52,10 +52,16 @@ export default function AuthPage() {
     loginMutation.mutate(data);
   };
 
-  const onRegisterSubmit = (data: RegisterFormValues) => {
-    // We don't need confirmPassword field for API
+  const [, setLocation] = useLocation();
+  
+  const onRegisterSubmit = async (data: RegisterFormValues) => {
     const { confirmPassword, ...registerData } = data;
-    registerMutation.mutate(registerData);
+    try {
+      await registerMutation.mutateAsync(registerData);
+      setLocation("/setup");
+    } catch (error) {
+      // Error will be handled by the mutation
+    }
   };
 
   // If user is already logged in, redirect to home
