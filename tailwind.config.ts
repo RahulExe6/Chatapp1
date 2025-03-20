@@ -10,6 +10,17 @@ export default {
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
       },
+      spacing: {
+        '4.5': '1.125rem',
+        '18': '4.5rem',
+      },
+      boxShadow: {
+        'soft': '0 2px 20px rgba(0, 0, 0, 0.06)',
+        'soft-lg': '0 4px 30px rgba(0, 0, 0, 0.08)',
+      },
+      fontSize: {
+        '2.5xl': '1.75rem',
+      },
       colors: {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
