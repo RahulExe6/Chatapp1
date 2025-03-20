@@ -1,6 +1,7 @@
 import { users, messages, type User, type InsertUser, type Message, type InsertMessage, type Chat } from "@shared/schema";
 import session from "express-session";
 import createMemoryStore from "memorystore";
+import { firebaseConfig } from "./firebase";
 
 const MemoryStore = createMemoryStore(session);
 
@@ -26,6 +27,7 @@ export interface IStorage {
   sessionStore: session.Store;
 }
 
+// Fall back to in-memory storage if Firebase setup fails
 export class MemStorage implements IStorage {
   private users: Map<number, User>;
   private messages: Map<number, Message>;
@@ -125,7 +127,7 @@ export class MemStorage implements IStorage {
     // Fetch chat info for each user
     const chats: Chat[] = [];
     
-    for (const chatUserId of uniqueUserIds) {
+    for (const chatUserId of Array.from(uniqueUserIds)) {
       const chatUser = await this.getUser(chatUserId);
       if (!chatUser) continue;
 
@@ -168,4 +170,11 @@ export class MemStorage implements IStorage {
   }
 }
 
-export const storage = new MemStorage();
+// Initialize the storage system
+let storage: IStorage;
+
+// For now, we'll use the in-memory storage while Firebase integration is in progress
+storage = new MemStorage();
+console.log('Using in-memory storage (Firebase integration in progress)');
+
+export { storage };
