@@ -38,7 +38,7 @@ export default function ProfilePage() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-background">
+    <div className="flex flex-col min-h-screen bg-background overflow-y-auto">
       {/* Header */}
       <header className="sticky top-0 z-10 bg-background border-b border-border p-4 flex items-center">
         <Button

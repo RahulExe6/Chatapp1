@@ -25,7 +25,8 @@ export default function EditProfile() {
   const { toast } = useToast();
   const [open, setOpen] = useState(false);
   const [name, setName] = useState(user?.name || "");
-  const [profilePicture, setProfilePicture] = useState(user?.profilePicture || "");
+  const defaultAvatar = `https://api.dicebear.com/7.x/micah/svg?seed=${user?.username || 'default'}`;
+  const [profilePicture, setProfilePicture] = useState(user?.profilePicture || defaultAvatar);
 
   // Profile update mutation
   const updateProfileMutation = useMutation({
