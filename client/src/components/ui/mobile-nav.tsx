@@ -18,10 +18,12 @@ export default function MobileNav() {
         <Bell className="h-5 w-5" />
         <p className="text-xs mt-1">Alerts</p>
       </a>
-      <a href="#" className="text-muted-foreground text-center flex flex-col items-center">
-        <User className="h-5 w-5" />
-        <p className="text-xs mt-1">Profile</p>
-      </a>
+      <Link href="/profile">
+        <a className="text-muted-foreground text-center flex flex-col items-center">
+          <User className="h-5 w-5" />
+          <p className="text-xs mt-1">Profile</p>
+        </a>
+      </Link>
     </div>
   );
 }

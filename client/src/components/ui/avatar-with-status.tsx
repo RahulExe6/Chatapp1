@@ -8,6 +8,7 @@ interface AvatarWithStatusProps {
   isOnline?: boolean;
   size?: "sm" | "md" | "lg";
   showStatus?: boolean;
+  className?: string;
 }
 
 export default function AvatarWithStatus({
@@ -17,6 +18,7 @@ export default function AvatarWithStatus({
   isOnline = false,
   size = "md",
   showStatus = true,
+  className,
 }: AvatarWithStatusProps) {
   // Get initials from name or username
   const getInitials = () => {
@@ -58,7 +60,7 @@ export default function AvatarWithStatus({
   };
 
   return (
-    <div className="relative">
+    <div className={cn("relative", className)}>
       {src ? (
         <img
           src={src}
